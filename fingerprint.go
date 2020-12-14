@@ -20,6 +20,6 @@ func newFingerprint(item []byte, length uint) fingerprint {
 }
 
 func calculateHash(item []byte, length uint) (hashedItem []byte) {
-	hashedItem = mmh3.Hash128(item)
+	hashedItem = mmh3.Hash128(item).Bytes()
 	return
 }

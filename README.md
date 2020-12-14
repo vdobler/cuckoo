@@ -1,19 +1,14 @@
 # Cuckoo Filter
 
-[![Latest Version](http://img.shields.io/github/release/mtchavez/cuckoo.svg?style=flat-square)](https://github.com/mtchavez/cuckoo/releases)
-[![Build Status](https://travis-ci.org/mtchavez/cuckoo.svg?branch=master)](https://travis-ci.org/mtchavez/cuckoo)
-[![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)](http://godoc.org/github.com/mtchavez/cuckoo)
-[![Go Report Card](https://goreportcard.com/badge/github.com/mtchavez/cuckoo)](https://goreportcard.com/report/github.com/mtchavez/cuckoo)
-[![Maintainability](https://api.codeclimate.com/v1/badges/3e295a8cb3cfe6f8c1ee/maintainability)](https://codeclimate.com/github/mtchavez/cuckoo/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/3e295a8cb3cfe6f8c1ee/test_coverage)](https://codeclimate.com/github/mtchavez/cuckoo/test_coverage)
-
 Cuckoo Filter in Go
 
-## Install
+This is maintained fork of from github.com/mtchavez/cuckoo.
+It differs from the original by:
 
-Install via `go get`
+- Strict use of Go modules
+- Up to date dependencies
+- No makefile for build and test
 
-`go get -u -v github.com/mtchavez/cuckoo`
 
 ## Usage
 
@@ -31,120 +26,105 @@ Install via `go get`
 
 Create a new filter with default configuration
 
-```go
-package main
-
-import "github.com/mtchavez/cuckoo"
-
-func main() {
-  cuckoo.New()
-}
-```
+    package main
+ 
+    import "github.com/mtchavez/cuckoo"
+ 
+    func main() {
+        cuckoo.New()
+    }
 
 ### Configuration
 
 You can configure a filter via a `ConfigOption` type and the composed config option
 functions provided.
 
-```go
-package main
+	package main
 
-import "github.com/mtchavez/cuckoo"
+	import "github.com/mtchavez/cuckoo"
 
-func main() {
-	options := []cuckoo.ConfigOption{
-		cuckoo.BucketEntries(uint(24)),
-		cuckoo.BucketTotal(uint(1 << 16)),
-		cuckoo.FingerprintLength(uint(1)),
-		cuckoo.Kicks(uint(250)),
+	func main() {
+		options := []cuckoo.ConfigOption{
+			cuckoo.BucketEntries(uint(24)),
+			cuckoo.BucketTotal(uint(1 << 16)),
+			cuckoo.FingerprintLength(uint(1)),
+			cuckoo.Kicks(uint(250)),
+		}
+		cuckoo.New(options...)
 	}
-	cuckoo.New(options...)
-}
-```
 
 ### Insert
 
 Inserting items into a filter
 
-```go
-package main
+	package main
 
-import "github.com/mtchavez/cuckoo"
+	import "github.com/mtchavez/cuckoo"
 
-func main() {
-  filter := cuckoo.New()
-  filter.Insert([]byte("special-items"))
-}
-```
+	func main() {
+	    filter := cuckoo.New()
+	    filter.Insert([]byte("special-items"))
+	}
 
 ### Insert Unique
 
 Inserting items into a filter only if they do not already exist
 
-```go
-package main
+	package main
 
-import (
-  "fmt"
+	import (
+	    "fmt"
+	    "github.com/mtchavez/cuckoo"
+	)
 
-  "github.com/mtchavez/cuckoo"
-)
-
-func main() {
-  filter := cuckoo.New()
-  filter.InsertUnique([]byte("special-items"))
-  filter.InsertUnique([]byte("special-items"))
-  if filter.ItemCount() != 1 {
-    fmt.Println("Expected only 1 item")
-  }
-}
-```
+	func main() {
+	  filter := cuckoo.New()
+	  filter.InsertUnique([]byte("special-items"))
+	  filter.InsertUnique([]byte("special-items"))
+	  if filter.ItemCount() != 1 {
+	      fmt.Println("Expected only 1 item")
+	  }
+	}
 
 ### Lookup
 
 Check if items exist in the filter using Lookup
 
-```go
-package main
+	package main
 
-import (
-  "fmt"
+	import (
+	    "fmt"
+	    "github.com/mtchavez/cuckoo"
+	)
 
-  "github.com/mtchavez/cuckoo"
-)
-
-func main() {
-  filter := cuckoo.New()
-  filter.Insert([]byte("special-items"))
-  found := filter.Lookup([]byte("special-items"))
-  if !found {
-    fmt.Println("Expected to find item in filter")
-  }
-}
-```
+	func main() {
+	  filter := cuckoo.New()
+	  filter.Insert([]byte("special-items"))
+	  found := filter.Lookup([]byte("special-items"))
+	  if !found {
+	      fmt.Println("Expected to find item in filter")
+	  }
+	}
 
 ### Delete
 
 Deleting an item if it exists in the filter
 
-```go
-package main
+	package main
 
-import (
-  "fmt"
+	import (
+	    "fmt"
+	    "github.com/mtchavez/cuckoo"
+	)
 
-  "github.com/mtchavez/cuckoo"
-)
-
-func main() {
-  filter := cuckoo.New()
-  filter.Insert([]byte("special-items"))
-  deleted := filter.Delete([]byte("special-items"))
-  if !deleted {
-    fmt.Println("Expected to delete item from filter")
-  }
-}
-```
+	func main() {
+	  filter := cuckoo.New()
+	  filter.Insert([]byte("special-items"))
+	  deleted := filter.Delete([]byte("special-items"))
+	  if !deleted {
+	      fmt.Println("Expected to delete item from filter")
+	  }
+	}
 
 ### Item Count
 
@@ -152,69 +132,60 @@ Getting the item count of filter. **Using Insert with duplicates will cause the
 item count to be more like a total items inserted count**. Using InsertUnique
 and checking the ItemCount will be more of a *real* item count.
 
-```go
-package main
+	package main
 
-import (
-  "fmt"
+	import (
+        "fmt"
+	    "github.com/mtchavez/cuckoo"
+	)
 
-  "github.com/mtchavez/cuckoo"
-)
-
-func main() {
-  filter := cuckoo.New()
-  filter.InsertUnique([]byte("special-items"))
-  filter.InsertUnique([]byte("special-items"))
-  if filter.ItemCount() != 1 {
-    fmt.Println("Expected only 1 item")
-  }
-}
-```
+	func main() {
+	  filter := cuckoo.New()
+	  filter.InsertUnique([]byte("special-items"))
+	  filter.InsertUnique([]byte("special-items"))
+	  if filter.ItemCount() != 1 {
+	      fmt.Println("Expected only 1 item")
+	  }
+	}
 
 ### Save
 
 Encode and save a filter to be able to re-build or re-load back into memory.
 
-```go
-package main
+	package main
 
-import (
-  "fmt"
+	import (
+	    "fmt"
+	    "github.com/mtchavez/cuckoo"
+	)
 
-  "github.com/mtchavez/cuckoo"
-)
-
-func main() {
-	filter := New()
-	item := []byte("Largo")
-	filter.InsertUnique(item)
-	filter.Save("./tmp/example_save.gob")
-}
-```
+	func main() {
+		filter := New()
+		item := []byte("Largo")
+		filter.InsertUnique(item)
+		filter.Save("./tmp/example_save.gob")
+	}
 
 ### Load
 
 Load a filter back into memory from an encoded filter saved to a file.
 
-```go
 package main
 
-import (
-  "fmt"
+	import (
+	    "fmt"
+	    "github.com/mtchavez/cuckoo"
+	)
 
-  "github.com/mtchavez/cuckoo"
-)
+	func main() {
+		filter := New()
+		item := []byte("Largo")
+		filter.InsertUnique(item)
+		filter.Save("./tmp/example_save.gob")
 
-func main() {
-	filter := New()
-	item := []byte("Largo")
-	filter.InsertUnique(item)
-	filter.Save("./tmp/example_save.gob")
-
-	loadedFilter, _ := Load("./tmp/example_save.gob")
-	fmt.Printf("Loaded filter has same item? %v\n\n", loadedFilter.Lookup(item))
-}
-```
+		loadedFilter, _ := Load("./tmp/example_save.gob")
+		fmt.Printf("Loaded filter has same item? %v\n\n", loadedFilter.Lookup(item))
+	}
 
 ## Benchmarks
 
